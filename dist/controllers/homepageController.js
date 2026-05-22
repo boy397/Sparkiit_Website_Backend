@@ -19,17 +19,24 @@ const Faq_1 = __importDefault(require("../models/Faq"));
 const FooterSetting_1 = __importDefault(require("../models/FooterSetting"));
 const Menu_1 = __importDefault(require("../models/Menu"));
 const Setting_1 = __importDefault(require("../models/Setting"));
+const HorizontalScrollItem_1 = __importDefault(require("../models/HorizontalScrollItem"));
 // @desc    Get all homepage data
 // @route   GET /api/public/homepage
 // @access  Public
 const getHomepageData = async (req, res) => {
     try {
-        const [projects, services, contents, testimonials, homePage, blogs, events, mentors, brands, socialLinks, faqs, recognitions, footerSettings, menus, settings] = await Promise.all([
+        const [projects, services, contents, testimonials, homePage, blogs, events, mentors, brands, socialLinks, faqs, recognitions, footerSettings, menus, settings, horizontalScrollItems] = await Promise.all([
             Project_1.default.find().sort({ order: 1 }),
             Service_1.default.find().sort({ order: 1 }),
             SectionContent_1.default.find(),
             Testimonial_1.default.find().sort({ order: 1 }),
-            PageModel_1.default.findOne({ name: 'Home' }),
+            PageModel_1.default.findOne({
+                $or: [
+                    { name: /^home$/i },
+                    { slug: 'home' },
+                    { slug: '/' }
+                ]
+            }),
             Blog_1.default.find().sort({ createdAt: -1 }).limit(6),
             Event_1.default.find().sort({ date: 1 }),
             Mentor_1.default.find().sort({ order: 1 }),
@@ -39,7 +46,8 @@ const getHomepageData = async (req, res) => {
             Recognition_1.default.find().sort({ order: 1 }),
             FooterSetting_1.default.find(),
             Menu_1.default.find().sort({ order: 1 }),
-            Setting_1.default.find({ group: { $in: ['contact_page', 'enrollment'] } })
+            Setting_1.default.find({ group: { $in: ['contact_page', 'enrollment'] } }),
+            HorizontalScrollItem_1.default.find().sort({ order: 1 })
         ]);
         // Transform contents array into a nested object
         const contentMap = {};
@@ -99,7 +107,8 @@ const getHomepageData = async (req, res) => {
                 menus,
                 content: contentMap,
                 settings: settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {}),
-                pageStructure: homePage?.sections || []
+                pageStructure: homePage?.sections || [],
+                horizontalScrollItems
             }
         });
     }

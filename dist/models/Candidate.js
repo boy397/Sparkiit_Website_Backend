@@ -80,13 +80,9 @@ const CandidateSchema = new mongoose_1.Schema({
     batchRank: { type: String, default: 'N/A' },
     stipendEligible: { type: Boolean, default: false },
     skills: {
-        tech: { type: Number, default: 0 },
-        softSkills: { type: Number, default: 0 },
-        blockchain: { type: Number, default: 0 },
-        smartContracts: { type: Number, default: 0 },
-        frontend: { type: Number, default: 0 },
-        ai: { type: Number, default: 0 },
-        systemDesign: { type: Number, default: 0 },
+        type: Map,
+        of: Number,
+        default: {}
     },
     completedTests: [
         {
@@ -109,6 +105,10 @@ const CandidateSchema = new mongoose_1.Schema({
         type: String,
         enum: ['active', 'inactive'],
         default: 'active',
+    },
+    avatar: {
+        type: String,
+        default: '',
     },
 }, {
     timestamps: true,

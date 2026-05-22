@@ -37,6 +37,7 @@ const mongoose_1 = __importStar(require("mongoose"));
 const ServiceSchema = new mongoose_1.Schema({
     title: { type: String, required: true },
     description: { type: String, default: "" },
+    category: { type: String, default: "" },
     link: { type: String, default: "" },
     icon: { type: String, default: "Globe" },
     thumbnailUrl: { type: String, default: "" },

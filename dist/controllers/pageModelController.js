@@ -17,10 +17,13 @@ const getAllPageModels = async (req, res) => {
 exports.getAllPageModels = getAllPageModels;
 const createPageModel = async (req, res) => {
     try {
-        const { name, slug, sections } = req.body;
+        const { name, slug } = req.body;
         // Auto-generate slug if not provided
         const finalSlug = slug || name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-        const newItem = new PageModel_1.default({ name, slug: finalSlug, sections });
+        const newItem = new PageModel_1.default({
+            ...req.body,
+            slug: finalSlug
+        });
         await newItem.save();
         res.status(201).json({ success: true, data: newItem });
     }
@@ -31,7 +34,7 @@ const createPageModel = async (req, res) => {
 exports.createPageModel = createPageModel;
 const getPageBySlug = async (req, res) => {
     try {
-        const item = await PageModel_1.default.findOne({ slug: req.params.slug });
+        const item = await PageModel_1.default.findOne({ slug: { $regex: new RegExp(`^${req.params.slug}$`, 'i') } });
         if (!item) {
             res.status(404).json({ success: false, message: 'Page not found' });
             return;

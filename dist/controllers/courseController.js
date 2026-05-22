@@ -8,7 +8,7 @@ const Course_1 = __importDefault(require("../models/Course"));
 // GET /api/admin/courses
 const getAllCourses = async (req, res) => {
     try {
-        const { search, status, category, minPrice, maxPrice, sortBy, level, instructorId, isPopular, showHomepage } = req.query;
+        const { search, status, category, batchStatus, minPrice, maxPrice, sortBy, level, instructorId, isPopular, showHomepage } = req.query;
         const filter = {};
         if (search) {
             filter.$or = [
@@ -20,6 +20,8 @@ const getAllCourses = async (req, res) => {
             filter.status = status;
         if (category)
             filter.category = category;
+        if (batchStatus)
+            filter.batchStatus = batchStatus;
         if (level)
             filter.level = level;
         if (instructorId)

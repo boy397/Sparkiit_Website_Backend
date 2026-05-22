@@ -27,6 +27,7 @@ router.get('/blogs', blogController_1.getAllBlogs);
 router.get('/mentors', mentorController_1.getPublicMentors);
 router.get('/events', eventController_1.getAllEventsPublic);
 router.get('/faqs', faqController_1.getAllFaqs);
+router.get('/pages', pageModelController_1.getAllPageModels);
 router.get('/pages/:slug', pageModelController_1.getPageBySlug);
 // Candidate Authentication
 router.post('/auth/signup', candidateAuthController_1.signup);
@@ -43,4 +44,5 @@ router.get('/dashboard', authMiddleware_1.protect, dashboardController_1.getDash
 router.get('/dashboard/certificates', authMiddleware_1.protect, dashboardController_1.getStudentCertificates);
 router.get('/dashboard/tests', authMiddleware_1.protect, dashboardController_1.getStudentTests);
 router.post('/dashboard/projects/submit', authMiddleware_1.protect, dashboardController_1.submitProject);
+router.put('/dashboard/profile', authMiddleware_1.protect, dashboardController_1.updateProfile);
 exports.default = router;

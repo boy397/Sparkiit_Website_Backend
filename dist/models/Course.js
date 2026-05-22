@@ -65,6 +65,11 @@ const CourseSchema = new mongoose_1.Schema({
         enum: ['active', 'draft', 'archived'],
         default: 'draft',
     },
+    batchStatus: {
+        type: String,
+        enum: ['ongoing', 'upcoming', 'past', 'self-paced'],
+        default: 'ongoing',
+    },
     imageUrl: {
         type: String,
         default: '',

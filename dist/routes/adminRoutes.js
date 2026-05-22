@@ -11,6 +11,7 @@ const uploadMiddleware_1 = require("../middleware/uploadMiddleware");
 const contentController_1 = require("../controllers/contentController");
 const projectController_1 = require("../controllers/projectController");
 const serviceController_1 = require("../controllers/serviceController");
+const horizontalScrollController_1 = require("../controllers/horizontalScrollController");
 const authMiddleware_1 = require("../middleware/authMiddleware");
 // --- DOMAIN IMPORTS ---
 const badgeController_1 = require("../controllers/badgeController");
@@ -93,6 +94,10 @@ router.get('/services', authMiddleware_1.protect, serviceController_1.getAllServ
 router.post('/services', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), serviceController_1.createService);
 router.put('/services/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), serviceController_1.updateService);
 router.delete('/services/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), serviceController_1.deleteService);
+router.get('/horizontal-scroll', authMiddleware_1.protect, horizontalScrollController_1.getAllHorizontalScrollItemsAdmin);
+router.post('/horizontal-scroll', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), horizontalScrollController_1.createHorizontalScrollItem);
+router.put('/horizontal-scroll/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), horizontalScrollController_1.updateHorizontalScrollItem);
+router.delete('/horizontal-scroll/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), horizontalScrollController_1.deleteHorizontalScrollItem);
 router.get('/badges', authMiddleware_1.protect, badgeController_1.getAllBadges);
 router.post('/badges', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), badgeController_1.createBadge);
 router.put('/badges/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), badgeController_1.updateBadge);

@@ -34,18 +34,14 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const PageModelSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
-    slug: { type: String, required: true, unique: true, index: true },
-    status: { type: String, enum: ['active', 'inactive'], default: 'active' },
-    isSimple: { type: Boolean, default: false },
-    sections: [{
-            name: { type: String, required: true },
-            enabled: { type: Boolean, default: true },
-            order: { type: Number, required: true },
-            content: { type: mongoose_1.Schema.Types.Mixed, default: {} }
-        }]
+const HorizontalScrollItemSchema = new mongoose_1.Schema({
+    title: { type: String, required: true },
+    description: { type: String, default: "" },
+    category: { type: String, default: "GENERAL" },
+    image: { type: String, default: "" },
+    num: { type: String, default: "" },
+    order: { type: Number, default: 0 }
 }, {
     timestamps: true
 });
-exports.default = mongoose_1.default.models.PageModel || mongoose_1.default.model('PageModel', PageModelSchema);
+exports.default = mongoose_1.default.models.HorizontalScrollItem || mongoose_1.default.model('HorizontalScrollItem', HorizontalScrollItemSchema);
