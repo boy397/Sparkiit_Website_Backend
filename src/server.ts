@@ -32,7 +32,7 @@ app.use((req: Request, res: Response, next) => {
         'https://sparkiit-website-frontend-git-main-sunirmal147-7225s-projects.vercel.app'
     ].filter(Boolean);
 
-    if (origin && (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app'))) {
+    if (origin && (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app') || origin.startsWith('http://192.168.'))) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     }
     

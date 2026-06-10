@@ -120,28 +120,43 @@ export const getHomepageData = async (req: ExpressRequest, res: ExpressResponse)
         contentMap.process.step3Title = "TRANSFORMATION";
         contentMap.process.step3Desc = "Transform yourself with real-world experience, industry-relevant skills, and career-focused execution.";
 
-        res.status(200).json({
-            success: true,
-            data: {
-                projects,
-                services,
-                testimonials,
-                blogs,
-                events,
-                mentors,
-                brands,
-                collaborators,
-                socialLinks,
-                faqs,
-                recognitions,
-                footerSettings,
-                menus,
-                content: contentMap,
-                settings: settings.reduce((acc: any, s: any) => ({ ...acc, [s.key]: s.value }), {}),
-                pageStructure: homePage?.sections || [],
-                horizontalScrollItems
-            }
-        });
+                const defaultPageStructure = [
+                    { name: 'HeroSection', enabled: true, order: 1 },
+                    { name: 'Marquee', enabled: true, order: 2 },
+                    { name: 'HorizontalScroll', enabled: true, order: 3 },
+                    { name: 'WorkingProcess', enabled: true, order: 4 },
+                    { name: 'OurStory', enabled: true, order: 5 },
+                    { name: 'CompanyInsights', enabled: true, order: 6 },
+                    { name: 'LatestProjects', enabled: true, order: 7 },
+                    { name: 'FeaturedIn', enabled: true, order: 8 },
+                    { name: 'MentorsSection', enabled: true, order: 9 },
+                    { name: 'Testimonials', enabled: true, order: 10 },
+                    { name: 'FaqSection', enabled: true, order: 11 },
+                    { name: 'ContactSection', enabled: true, order: 12 }
+                ];
+                
+                res.status(200).json({
+                    success: true,
+                    data: {
+                        projects,
+                        services,
+                        testimonials,
+                        blogs,
+                        events,
+                        mentors,
+                        brands,
+                        collaborators,
+                        socialLinks,
+                        faqs,
+                        recognitions,
+                        footerSettings,
+                        menus,
+                        content: contentMap,
+                        settings: settings.reduce((acc: any, s: any) => ({ ...acc, [s.key]: s.value }), {}),
+                        pageStructure: (homePage?.sections && homePage.sections.length > 0) ? homePage.sections : defaultPageStructure,
+                        horizontalScrollItems
+                    }
+                });
     } catch (error: any) {
         res.status(500).json({
             success: false,
