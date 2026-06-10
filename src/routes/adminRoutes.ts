@@ -68,6 +68,7 @@ import { getAllCoupons, createCoupon, updateCoupon, deleteCoupon } from '../cont
 import { getAllWithdrawals, createWithdrawal, updateWithdrawal, deleteWithdrawal } from '../controllers/withdrawalController';
 import { getAllLocations, createLocation, updateLocation, deleteLocation } from '../controllers/locationController';
 import { getAllBrands, createBrand, updateBrand, deleteBrand } from '../controllers/brandController';
+import { getAllCollaborators, createCollaborator, updateCollaborator, deleteCollaborator } from '../controllers/collaboratorController';
 import { getAllFooterSettings, createFooterSetting, updateFooterSetting, deleteFooterSetting } from '../controllers/footerSettingController';
 import { getAllMenus, createMenu, updateMenu, deleteMenu } from '../controllers/menuController';
 import { getAllPageModels, createPageModel, updatePageModel, deletePageModel, getPageBySlug } from '../controllers/pageModelController';
@@ -239,6 +240,11 @@ router.get('/brands', protect, getAllBrands);
 router.post('/brands', protect, authorize('SUPER_ADMIN'), createBrand);
 router.put('/brands/:id', protect, authorize('SUPER_ADMIN'), updateBrand);
 router.delete('/brands/:id', protect, authorize('SUPER_ADMIN'), deleteBrand);
+
+router.get('/collaborators', protect, getAllCollaborators);
+router.post('/collaborators', protect, authorize('SUPER_ADMIN'), createCollaborator);
+router.put('/collaborators/:id', protect, authorize('SUPER_ADMIN'), updateCollaborator);
+router.delete('/collaborators/:id', protect, authorize('SUPER_ADMIN'), deleteCollaborator);
 
 router.get('/footer-settings', protect, getAllFooterSettings);
 router.post('/footer-settings', protect, authorize('SUPER_ADMIN'), createFooterSetting);

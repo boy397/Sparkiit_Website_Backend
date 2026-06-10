@@ -15,6 +15,7 @@ import FooterSetting from '../models/FooterSetting';
 import Menu from '../models/Menu';
 import Setting from '../models/Setting';
 import HorizontalScrollItem from '../models/HorizontalScrollItem';
+import Collaborator from '../models/Collaborator';
 
 // @desc    Get all homepage data
 // @route   GET /api/public/homepage
@@ -37,7 +38,8 @@ export const getHomepageData = async (req: ExpressRequest, res: ExpressResponse)
             footerSettings,
             menus,
             settings,
-            horizontalScrollDb
+            horizontalScrollDb,
+            collaborators
         ] = await Promise.all([
             Project.find().sort({ order: 1 }),
             Service.find().sort({ order: 1 }),
@@ -59,8 +61,9 @@ export const getHomepageData = async (req: ExpressRequest, res: ExpressResponse)
             Recognition.find().sort({ order: 1 }),
             FooterSetting.find(),
             Menu.find().sort({ order: 1 }),
-            Setting.find({ group: { $in: ['contact_page', 'enrollment'] } }),
-            HorizontalScrollItem.find().sort({ order: 1 })
+            Setting.find({ group: { $in: ['contact_page', 'enrollment', 'footer', 'general'] } }),
+            HorizontalScrollItem.find().sort({ order: 1 }),
+            Collaborator.find().sort({ order: 1 })
         ]);
 
         const horizontalScrollItems = horizontalScrollDb.map((item, index) => ({
@@ -127,6 +130,7 @@ export const getHomepageData = async (req: ExpressRequest, res: ExpressResponse)
                 events,
                 mentors,
                 brands,
+                collaborators,
                 socialLinks,
                 faqs,
                 recognitions,
