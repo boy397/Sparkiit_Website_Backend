@@ -6,6 +6,7 @@ export interface IHorizontalScrollItem extends Document {
     category: string;
     image: string;
     num: string;
+    link?: string;
     order: number;
 }
 
@@ -15,6 +16,7 @@ const HorizontalScrollItemSchema: Schema = new Schema({
     category: { type: String, default: "GENERAL" },
     image: { type: String, default: "" },
     num: { type: String, default: "" },
+    link: { type: String, default: "" },
     order: { type: Number, default: 0 }
 }, {
     timestamps: true

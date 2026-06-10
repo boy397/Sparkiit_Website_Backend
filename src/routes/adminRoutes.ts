@@ -34,7 +34,7 @@ import {
     deleteTemplate,
     uploadTemplatePDF,
 } from '../controllers/templateController';
-import { upload } from '../middleware/uploadMiddleware';
+import { upload, uploadImage } from '../middleware/uploadMiddleware';
 import {
     getAllContent,
     updateContentBatch,
@@ -145,6 +145,46 @@ router.get('/certificate-templates', protect, authorize('SUPER_ADMIN'), getAllTe
 router.post('/certificate-templates', protect, authorize('SUPER_ADMIN'), createTemplate);
 router.delete('/certificate-templates/:id', protect, authorize('SUPER_ADMIN'), deleteTemplate);
 router.post('/certificate-templates/upload', protect, authorize('SUPER_ADMIN'), upload.single('pdf'), uploadTemplatePDF);
+router.post('/upload-image', protect, authorize('SUPER_ADMIN', 'ADMIN'), uploadImage.single('image'), (req, res) => {
+    try {
+        if (!req.file) {
+            res.status(400).json({ success: false, message: 'No file uploaded' });
+            return;
+        }
+        const uploadType = req.body.uploadType || 'misc';
+        const fileUrl = `/uploads/${uploadType}/${req.file.filename}`;
+        res.json({
+            success: true,
+            data: {
+                url: fileUrl,
+                filename: req.file.filename
+            }
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+router.post('/upload-pdf', protect, authorize('SUPER_ADMIN', 'ADMIN'), upload.single('pdf'), (req, res) => {
+    try {
+        if (!req.file) {
+            res.status(400).json({ success: false, message: 'No file uploaded' });
+            return;
+        }
+        const uploadType = req.body.uploadType || 'documents';
+        const fileUrl = `/uploads/${uploadType}/${req.file.filename}`;
+        res.json({
+            success: true,
+            data: {
+                url: fileUrl,
+                filename: req.file.filename
+            }
+        });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
 
 router.get('/content', protect, getAllContent);
 router.put('/content/batch', protect, authorize('SUPER_ADMIN'), updateContentBatch);
