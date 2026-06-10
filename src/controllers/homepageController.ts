@@ -14,7 +14,7 @@ import Faq from '../models/Faq';
 import FooterSetting from '../models/FooterSetting';
 import Menu from '../models/Menu';
 import Setting from '../models/Setting';
-import HorizontalScrollItem from '../models/HorizontalScrollItem';
+import Course from '../models/Course';
 
 // @desc    Get all homepage data
 // @route   GET /api/public/homepage
@@ -37,7 +37,7 @@ export const getHomepageData = async (req: ExpressRequest, res: ExpressResponse)
             footerSettings,
             menus,
             settings,
-            horizontalScrollItems
+            coursesForScroll
         ] = await Promise.all([
             Project.find().sort({ order: 1 }),
             Service.find().sort({ order: 1 }),
@@ -60,8 +60,18 @@ export const getHomepageData = async (req: ExpressRequest, res: ExpressResponse)
             FooterSetting.find(),
             Menu.find().sort({ order: 1 }),
             Setting.find({ group: { $in: ['contact_page', 'enrollment'] } }),
-            HorizontalScrollItem.find().sort({ order: 1 })
+            Course.find({ showHomepage: true, status: 'active' }).sort({ createdAt: -1 })
         ]);
+
+        const horizontalScrollItems = coursesForScroll.map((c, index) => ({
+            _id: c._id.toString(),
+            title: c.title,
+            description: c.description,
+            category: c.category,
+            image: c.imageUrl,
+            num: (index + 1).toString().padStart(2, '0'),
+            order: index
+        }));
 
         // Transform contents array into a nested object
         const contentMap: any = {};

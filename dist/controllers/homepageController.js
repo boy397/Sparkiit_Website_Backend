@@ -19,13 +19,13 @@ const Faq_1 = __importDefault(require("../models/Faq"));
 const FooterSetting_1 = __importDefault(require("../models/FooterSetting"));
 const Menu_1 = __importDefault(require("../models/Menu"));
 const Setting_1 = __importDefault(require("../models/Setting"));
-const HorizontalScrollItem_1 = __importDefault(require("../models/HorizontalScrollItem"));
+const Course_1 = __importDefault(require("../models/Course"));
 // @desc    Get all homepage data
 // @route   GET /api/public/homepage
 // @access  Public
 const getHomepageData = async (req, res) => {
     try {
-        const [projects, services, contents, testimonials, homePage, blogs, events, mentors, brands, socialLinks, faqs, recognitions, footerSettings, menus, settings, horizontalScrollItems] = await Promise.all([
+        const [projects, services, contents, testimonials, homePage, blogs, events, mentors, brands, socialLinks, faqs, recognitions, footerSettings, menus, settings, coursesForScroll] = await Promise.all([
             Project_1.default.find().sort({ order: 1 }),
             Service_1.default.find().sort({ order: 1 }),
             SectionContent_1.default.find(),
@@ -47,8 +47,17 @@ const getHomepageData = async (req, res) => {
             FooterSetting_1.default.find(),
             Menu_1.default.find().sort({ order: 1 }),
             Setting_1.default.find({ group: { $in: ['contact_page', 'enrollment'] } }),
-            HorizontalScrollItem_1.default.find().sort({ order: 1 })
+            Course_1.default.find({ showHomepage: true, status: 'active' }).sort({ createdAt: -1 })
         ]);
+        const horizontalScrollItems = coursesForScroll.map((c, index) => ({
+            _id: c._id.toString(),
+            title: c.title,
+            description: c.description,
+            category: c.category,
+            image: c.imageUrl,
+            num: (index + 1).toString().padStart(2, '0'),
+            order: index
+        }));
         // Transform contents array into a nested object
         const contentMap = {};
         contents.forEach(c => {

@@ -12,7 +12,9 @@ import Setting from '../models/Setting';
 // @route   GET /api/public/dashboard
 // @access  Private/Candidate
 export const getDashboardData = asyncHandler(async (req: Request, res: Response) => {
-    const candidate = await Candidate.findById(req.user?._id).populate('enrolledCourses');
+    const candidate = await Candidate.findById(req.user?._id)
+        .populate('enrolledCourses')
+        .populate('submittedProjects.projectId');
 
     if (!candidate) {
         res.status(404);

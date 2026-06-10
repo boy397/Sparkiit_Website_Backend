@@ -14,7 +14,9 @@ const Setting_1 = __importDefault(require("../models/Setting"));
 // @route   GET /api/public/dashboard
 // @access  Private/Candidate
 exports.getDashboardData = (0, express_async_handler_1.default)(async (req, res) => {
-    const candidate = await Candidate_1.default.findById(req.user?._id).populate('enrolledCourses');
+    const candidate = await Candidate_1.default.findById(req.user?._id)
+        .populate('enrolledCourses')
+        .populate('submittedProjects.projectId');
     if (!candidate) {
         res.status(404);
         throw new Error('Candidate not found');
