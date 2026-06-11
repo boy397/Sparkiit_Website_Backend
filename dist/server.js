@@ -12,6 +12,7 @@ const api_1 = __importDefault(require("./routes/api"));
 const adminRoutes_1 = __importDefault(require("./routes/adminRoutes"));
 const publicRoutes_1 = __importDefault(require("./routes/publicRoutes"));
 const path_1 = __importDefault(require("path"));
+const homepageController_1 = require("./controllers/homepageController");
 dotenv_1.default.config();
 // Connect to MongoDB
 (0, db_1.default)();
@@ -30,7 +31,7 @@ app.use((req, res, next) => {
         'https://sparkiit-frontend.vercel.app',
         'https://sparkiit-website-frontend-git-main-sunirmal147-7225s-projects.vercel.app'
     ].filter(Boolean);
-    if (origin && (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app'))) {
+    if (origin && (allowedOrigins.indexOf(origin) !== -1 || origin.includes('vercel.app') || origin.startsWith('http://192.168.'))) {
         res.setHeader('Access-Control-Allow-Origin', origin);
     }
     res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -42,8 +43,8 @@ app.use((req, res, next) => {
     }
     next();
 });
-app.use(express_1.default.json());
-app.use(express_1.default.urlencoded({ extended: true }));
+app.use(express_1.default.json({ limit: '10mb' }));
+app.use(express_1.default.urlencoded({ limit: '10mb', extended: true }));
 // Session Configuration
 app.use((0, express_session_1.default)({
     secret: process.env.SESSION_SECRET || 'sparkiit_default_secret',
@@ -61,6 +62,13 @@ app.use((0, express_session_1.default)({
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     }
 }));
+// Middleware to clear homepage cache on write operations (POST, PUT, DELETE, PATCH)
+app.use((req, res, next) => {
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+        (0, homepageController_1.clearHomepageCache)();
+    }
+    next();
+});
 app.use('/api', api_1.default);
 app.use('/api/admin', adminRoutes_1.default);
 app.use('/api/public', publicRoutes_1.default);

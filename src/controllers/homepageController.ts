@@ -17,11 +17,25 @@ import Setting from '../models/Setting';
 import HorizontalScrollItem from '../models/HorizontalScrollItem';
 import Collaborator from '../models/Collaborator';
 
+// Simple in-memory cache for homepage data
+let homepageCache: any = null;
+let homepageCacheTime: number = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
+
+export const clearHomepageCache = () => {
+    homepageCache = null;
+    homepageCacheTime = 0;
+};
+
 // @desc    Get all homepage data
 // @route   GET /api/public/homepage
 // @access  Public
 export const getHomepageData = async (req: ExpressRequest, res: ExpressResponse) => {
     try {
+        if (homepageCache && (Date.now() - homepageCacheTime < CACHE_TTL)) {
+            return res.status(200).json(homepageCache);
+        }
+
         const [
             projects, 
             services, 
@@ -135,7 +149,7 @@ export const getHomepageData = async (req: ExpressRequest, res: ExpressResponse)
                     { name: 'ContactSection', enabled: true, order: 12 }
                 ];
                 
-                res.status(200).json({
+                const responseData = {
                     success: true,
                     data: {
                         projects,
@@ -156,7 +170,12 @@ export const getHomepageData = async (req: ExpressRequest, res: ExpressResponse)
                         pageStructure: (homePage?.sections && homePage.sections.length > 0) ? homePage.sections : defaultPageStructure,
                         horizontalScrollItems
                     }
-                });
+                };
+
+                homepageCache = responseData;
+                homepageCacheTime = Date.now();
+
+                res.status(200).json(responseData);
     } catch (error: any) {
         res.status(500).json({
             success: false,

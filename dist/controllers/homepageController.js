@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getHomepageData = void 0;
+exports.getHomepageData = exports.clearHomepageCache = void 0;
 const Project_1 = __importDefault(require("../models/Project"));
 const Service_1 = __importDefault(require("../models/Service"));
 const SectionContent_1 = __importDefault(require("../models/SectionContent"));
@@ -19,13 +19,26 @@ const Faq_1 = __importDefault(require("../models/Faq"));
 const FooterSetting_1 = __importDefault(require("../models/FooterSetting"));
 const Menu_1 = __importDefault(require("../models/Menu"));
 const Setting_1 = __importDefault(require("../models/Setting"));
-const Course_1 = __importDefault(require("../models/Course"));
+const HorizontalScrollItem_1 = __importDefault(require("../models/HorizontalScrollItem"));
+const Collaborator_1 = __importDefault(require("../models/Collaborator"));
+// Simple in-memory cache for homepage data
+let homepageCache = null;
+let homepageCacheTime = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache
+const clearHomepageCache = () => {
+    homepageCache = null;
+    homepageCacheTime = 0;
+};
+exports.clearHomepageCache = clearHomepageCache;
 // @desc    Get all homepage data
 // @route   GET /api/public/homepage
 // @access  Public
 const getHomepageData = async (req, res) => {
     try {
-        const [projects, services, contents, testimonials, homePage, blogs, events, mentors, brands, socialLinks, faqs, recognitions, footerSettings, menus, settings, coursesForScroll] = await Promise.all([
+        if (homepageCache && (Date.now() - homepageCacheTime < CACHE_TTL)) {
+            return res.status(200).json(homepageCache);
+        }
+        const [projects, services, contents, testimonials, homePage, blogs, events, mentors, brands, socialLinks, faqs, recognitions, footerSettings, menus, settings, horizontalScrollDb, collaborators] = await Promise.all([
             Project_1.default.find().sort({ order: 1 }),
             Service_1.default.find().sort({ order: 1 }),
             SectionContent_1.default.find(),
@@ -46,17 +59,19 @@ const getHomepageData = async (req, res) => {
             Recognition_1.default.find().sort({ order: 1 }),
             FooterSetting_1.default.find(),
             Menu_1.default.find().sort({ order: 1 }),
-            Setting_1.default.find({ group: { $in: ['contact_page', 'enrollment'] } }),
-            Course_1.default.find({ showHomepage: true, status: 'active' }).sort({ createdAt: -1 })
+            Setting_1.default.find({ group: { $in: ['contact_page', 'enrollment', 'footer', 'general'] } }),
+            HorizontalScrollItem_1.default.find().sort({ order: 1 }),
+            Collaborator_1.default.find().sort({ order: 1 })
         ]);
-        const horizontalScrollItems = coursesForScroll.map((c, index) => ({
-            _id: c._id.toString(),
-            title: c.title,
-            description: c.description,
-            category: c.category,
-            image: c.imageUrl,
-            num: (index + 1).toString().padStart(2, '0'),
-            order: index
+        const horizontalScrollItems = horizontalScrollDb.map((item, index) => ({
+            _id: item._id.toString(),
+            title: item.title,
+            description: item.description || "",
+            category: item.category || "GENERAL",
+            image: item.image || "",
+            num: item.num || (index + 1).toString().padStart(2, '0'),
+            link: item.link || "",
+            order: item.order || index
         }));
         // Transform contents array into a nested object
         const contentMap = {};
@@ -99,7 +114,21 @@ const getHomepageData = async (req, res) => {
         contentMap.process.step2Desc = "Transform your ideas into impactful innovation through hands-on training and practical exposure.";
         contentMap.process.step3Title = "TRANSFORMATION";
         contentMap.process.step3Desc = "Transform yourself with real-world experience, industry-relevant skills, and career-focused execution.";
-        res.status(200).json({
+        const defaultPageStructure = [
+            { name: 'HeroSection', enabled: true, order: 1 },
+            { name: 'Marquee', enabled: true, order: 2 },
+            { name: 'HorizontalScroll', enabled: true, order: 3 },
+            { name: 'WorkingProcess', enabled: true, order: 4 },
+            { name: 'OurStory', enabled: true, order: 5 },
+            { name: 'CompanyInsights', enabled: true, order: 6 },
+            { name: 'LatestProjects', enabled: true, order: 7 },
+            { name: 'FeaturedIn', enabled: true, order: 8 },
+            { name: 'MentorsSection', enabled: true, order: 9 },
+            { name: 'Testimonials', enabled: true, order: 10 },
+            { name: 'FaqSection', enabled: true, order: 11 },
+            { name: 'ContactSection', enabled: true, order: 12 }
+        ];
+        const responseData = {
             success: true,
             data: {
                 projects,
@@ -109,6 +138,7 @@ const getHomepageData = async (req, res) => {
                 events,
                 mentors,
                 brands,
+                collaborators,
                 socialLinks,
                 faqs,
                 recognitions,
@@ -116,10 +146,13 @@ const getHomepageData = async (req, res) => {
                 menus,
                 content: contentMap,
                 settings: settings.reduce((acc, s) => ({ ...acc, [s.key]: s.value }), {}),
-                pageStructure: homePage?.sections || [],
+                pageStructure: (homePage?.sections && homePage.sections.length > 0) ? homePage.sections : defaultPageStructure,
                 horizontalScrollItems
             }
-        });
+        };
+        homepageCache = responseData;
+        homepageCacheTime = Date.now();
+        res.status(200).json(responseData);
     }
     catch (error) {
         res.status(500).json({

@@ -34,15 +34,12 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const HorizontalScrollItemSchema = new mongoose_1.Schema({
-    title: { type: String, required: true },
-    description: { type: String, default: "" },
-    category: { type: String, default: "GENERAL" },
-    image: { type: String, default: "" },
-    num: { type: String, default: "" },
+const CollaboratorSchema = new mongoose_1.Schema({
+    name: { type: String, required: true },
+    logoUrl: { type: String, default: "" },
     link: { type: String, default: "" },
     order: { type: Number, default: 0 }
 }, {
     timestamps: true
 });
-exports.default = mongoose_1.default.models.HorizontalScrollItem || mongoose_1.default.model('HorizontalScrollItem', HorizontalScrollItemSchema);
+exports.default = mongoose_1.default.models.Collaborator || mongoose_1.default.model('Collaborator', CollaboratorSchema);

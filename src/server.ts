@@ -8,6 +8,7 @@ import apiRoutes from './routes/api';
 import adminRoutes from './routes/adminRoutes';
 import publicRoutes from './routes/publicRoutes';
 import path from 'path';
+import { clearHomepageCache } from './controllers/homepageController';
 
 dotenv.config();
 
@@ -67,6 +68,14 @@ app.use(session({
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     }
 }));
+
+// Middleware to clear homepage cache on write operations (POST, PUT, DELETE, PATCH)
+app.use((req, res, next) => {
+    if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+        clearHomepageCache();
+    }
+    next();
+});
 
 app.use('/api', apiRoutes);
 app.use('/api/admin', adminRoutes);

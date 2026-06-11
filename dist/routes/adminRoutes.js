@@ -21,6 +21,7 @@ const couponController_1 = require("../controllers/couponController");
 const withdrawalController_1 = require("../controllers/withdrawalController");
 const locationController_1 = require("../controllers/locationController");
 const brandController_1 = require("../controllers/brandController");
+const collaboratorController_1 = require("../controllers/collaboratorController");
 const footerSettingController_1 = require("../controllers/footerSettingController");
 const menuController_1 = require("../controllers/menuController");
 const pageModelController_1 = require("../controllers/pageModelController");
@@ -83,6 +84,46 @@ router.get('/certificate-templates', authMiddleware_1.protect, (0, authMiddlewar
 router.post('/certificate-templates', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), templateController_1.createTemplate);
 router.delete('/certificate-templates/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), templateController_1.deleteTemplate);
 router.post('/certificate-templates/upload', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), uploadMiddleware_1.upload.single('pdf'), templateController_1.uploadTemplatePDF);
+router.post('/upload-image', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN', 'ADMIN'), uploadMiddleware_1.uploadImage.single('image'), (req, res) => {
+    try {
+        if (!req.file) {
+            res.status(400).json({ success: false, message: 'No file uploaded' });
+            return;
+        }
+        const uploadType = req.body.uploadType || 'misc';
+        const fileUrl = `/uploads/${uploadType}/${req.file.filename}`;
+        res.json({
+            success: true,
+            data: {
+                url: fileUrl,
+                filename: req.file.filename
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+router.post('/upload-pdf', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN', 'ADMIN'), uploadMiddleware_1.upload.single('pdf'), (req, res) => {
+    try {
+        if (!req.file) {
+            res.status(400).json({ success: false, message: 'No file uploaded' });
+            return;
+        }
+        const uploadType = req.body.uploadType || 'documents';
+        const fileUrl = `/uploads/${uploadType}/${req.file.filename}`;
+        res.json({
+            success: true,
+            data: {
+                url: fileUrl,
+                filename: req.file.filename
+            }
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
 router.get('/content', authMiddleware_1.protect, contentController_1.getAllContent);
 router.put('/content/batch', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), contentController_1.updateContentBatch);
 router.post('/content', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), contentController_1.updateSingleContent);
@@ -126,6 +167,10 @@ router.get('/brands', authMiddleware_1.protect, brandController_1.getAllBrands);
 router.post('/brands', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), brandController_1.createBrand);
 router.put('/brands/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), brandController_1.updateBrand);
 router.delete('/brands/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), brandController_1.deleteBrand);
+router.get('/collaborators', authMiddleware_1.protect, collaboratorController_1.getAllCollaborators);
+router.post('/collaborators', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), collaboratorController_1.createCollaborator);
+router.put('/collaborators/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), collaboratorController_1.updateCollaborator);
+router.delete('/collaborators/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), collaboratorController_1.deleteCollaborator);
 router.get('/footer-settings', authMiddleware_1.protect, footerSettingController_1.getAllFooterSettings);
 router.post('/footer-settings', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), footerSettingController_1.createFooterSetting);
 router.put('/footer-settings/:id', authMiddleware_1.protect, (0, authMiddleware_1.authorize)('SUPER_ADMIN'), footerSettingController_1.updateFooterSetting);
